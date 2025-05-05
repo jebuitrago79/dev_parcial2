@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Body
 from fastapi.params import Depends
 from sqlmodel import select
 from utils.connection_db import init_db, get_session
 from data.models import usuario
 from sqlmodel.ext.asyncio.session import AsyncSession
+from operations.operations_db import actualizar_usuario
 
 
 @asynccontextmanager
@@ -47,3 +48,11 @@ async def obtener_usuario(usuario_id: int, session: AsyncSession = Depends(get_s
     return encontrado
 
 
+from data.models import usuario
+
+@app.put("/usuarios/{usuario_id}")
+async def actualizar(usuario_id: int,datos: usuario = Body(...),session: AsyncSession = Depends(get_session)):
+    usuario_actualizado = await actualizar_usuario(usuario_id, datos.dict(exclude_unset=True), session)
+    if not usuario_actualizado:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return usuario_actualizado
