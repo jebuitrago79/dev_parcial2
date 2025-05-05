@@ -1,6 +1,10 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from utils.connection_db import init_db
+from fastapi.params import Depends
+
+from utils.connection_db import init_db, get_session
+from data.models import usuario
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 
 @asynccontextmanager
@@ -18,3 +22,12 @@ async def root():
 @app.get("/hello/{name}")
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
+
+@app.post("/usuario")
+async def crear_usuario( nuevo_usuario: usuario, session: AsyncSession = Depends(get_session)):
+    session.add(nuevo_usuario)
+    await session.commit()
+    await session.refresh(nuevo_usuario)
+    return nuevo_usuario
+
+
