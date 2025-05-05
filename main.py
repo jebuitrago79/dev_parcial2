@@ -5,7 +5,7 @@ from sqlmodel import select
 from utils.connection_db import init_db, get_session
 from data.models import usuario
 from sqlmodel.ext.asyncio.session import AsyncSession
-from operations.operations_db import actualizar_usuario
+from operations.operations_db import actualizar_usuario, hacer_usuario_premium
 
 
 @asynccontextmanager
@@ -53,6 +53,14 @@ from data.models import usuario
 @app.put("/usuarios/{usuario_id}")
 async def actualizar(usuario_id: int,datos: usuario = Body(...),session: AsyncSession = Depends(get_session)):
     usuario_actualizado = await actualizar_usuario(usuario_id, datos.dict(exclude_unset=True), session)
+    if not usuario_actualizado:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return usuario_actualizado
+
+
+@app.patch("/usuarios/{usuario_id}/premium")
+async def marcar_premium(usuario_id: int, session: AsyncSession = Depends(get_session)):
+    usuario_actualizado = await hacer_usuario_premium(usuario_id, session)
     if not usuario_actualizado:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return usuario_actualizado

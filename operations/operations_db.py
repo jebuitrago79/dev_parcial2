@@ -13,5 +13,12 @@ async def actualizar_usuario(usuario_id: int, datos: dict, session: AsyncSession
         await session.refresh(usuario_db)
     return usuario_db
 
-
+async def hacer_usuario_premium(usuario_id: int, session: AsyncSession):
+    usuario_db = await session.get(usuario, usuario_id)
+    if not usuario_db:
+        return None
+    usuario_db.premium = True
+    await session.commit()
+    await session.refresh(usuario_db)
+    return usuario_db
 
