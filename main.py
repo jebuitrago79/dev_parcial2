@@ -1,8 +1,7 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.params import Depends
 from sqlmodel import select
-
 from utils.connection_db import init_db, get_session
 from data.models import usuario
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -31,10 +30,20 @@ async def crear_usuario( nuevo_usuario: usuario, session: AsyncSession = Depends
     await session.refresh(nuevo_usuario)
     return nuevo_usuario
 
-
 @app.get("/usuarios")
 async def obtener_usuarios(session: AsyncSession = Depends(get_session)):
     consulta = select(usuario)
     resultado = await session.exec(consulta)
     usuarios = resultado.all()
     return usuarios
+
+@app.get("/usuarios/{usuario_id}")
+async def obtener_usuario(usuario_id: int, session: AsyncSession = Depends(get_session)):
+    consulta = select(usuario).where(usuario.id == usuario_id)
+    resultado = await session.exec(consulta)
+    encontrado = resultado.first()
+    if not encontrado:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return encontrado
+
+
