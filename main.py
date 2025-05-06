@@ -5,7 +5,7 @@ from sqlmodel import select
 from utils.connection_db import init_db, get_session
 from data.models import usuario
 from sqlmodel.ext.asyncio.session import AsyncSession
-from operations.operations_db import actualizar_usuario, hacer_usuario_premium, obtener_usuarios_activos
+from operations.operations_db import actualizar_usuario, hacer_usuario_premium, obtener_usuarios_activos, obtener_usuarios_premium_activos
 
 
 @asynccontextmanager
@@ -57,6 +57,10 @@ async def marcar_premium(usuario_id: int, session: AsyncSession = Depends(get_se
 @app.get("/usuarios/activos")
 async def listar_activos(session: AsyncSession = Depends(get_session)):
     return await obtener_usuarios_activos(session)
+
+@app.get("/usuarios/premium-activos")
+async def listar_premium_activos(session: AsyncSession = Depends(get_session)):
+    return await obtener_usuarios_premium_activos(session)
 
 @app.get("/usuarios/{usuario_id}")
 async def obtener_usuario(usuario_id: int, session: AsyncSession = Depends(get_session)):
