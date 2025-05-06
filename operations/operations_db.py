@@ -40,3 +40,8 @@ async def crear_tarea(nueva_tarea: tarea, session: AsyncSession):
     await session.commit()
     await session.refresh(nueva_tarea)
     return nueva_tarea
+
+async def obtener_todas_las_tareas(session: AsyncSession):
+    query = select(tarea)
+    result = await session.exec(query)
+    return result.all()

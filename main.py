@@ -5,7 +5,7 @@ from sqlmodel import select
 from utils.connection_db import init_db, get_session
 from data.models import usuario, tarea
 from sqlmodel.ext.asyncio.session import AsyncSession
-from operations.operations_db import actualizar_usuario, hacer_usuario_premium, obtener_usuarios_activos, obtener_usuarios_premium_activos
+from operations.operations_db import actualizar_usuario, hacer_usuario_premium, obtener_usuarios_activos, obtener_usuarios_premium_activos, obtener_todas_las_tareas
 from datetime import datetime
 
 @asynccontextmanager
@@ -85,3 +85,7 @@ async def crear_tarea(tarea_data: tarea, session: AsyncSession = Depends(get_ses
     await session.commit()
     await session.refresh(nueva_tarea)
     return nueva_tarea
+
+@app.get("/tareas")
+async def listar_tareas(session: AsyncSession = Depends(get_session)):
+    return await obtener_todas_las_tareas(session)
