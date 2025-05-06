@@ -90,16 +90,12 @@ async def crear_tarea(tarea_data: tarea, session: AsyncSession = Depends(get_ses
 async def listar_tareas(session: AsyncSession = Depends(get_session)):
     return await obtener_todas_las_tareas(session)
 
-
 @app.get("/tareas/{tarea_id}")
 async def tarea_por_id(tarea_id: int, session: AsyncSession = Depends(get_session)):
     tarea_encontrada = await obtener_tarea_por_id(tarea_id, session)
     if not tarea_encontrada:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return tarea_encontrada
-
-
-
 
 @app.patch("/tareas/{tarea_id}/estado")
 async def cambiar_estado_tarea(tarea_id: int, nuevo_estado: EstadoTarea,  session: AsyncSession = Depends(get_session)):
