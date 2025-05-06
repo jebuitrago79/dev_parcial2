@@ -22,3 +22,10 @@ async def hacer_usuario_premium(usuario_id: int, session: AsyncSession):
     await session.refresh(usuario_db)
     return usuario_db
 
+
+async def obtener_usuarios_activos(session: AsyncSession):
+    consulta = select(usuario).where(usuario.estado == "activo")
+    resultado = await session.exec(consulta)
+    return resultado.all()
+
+
