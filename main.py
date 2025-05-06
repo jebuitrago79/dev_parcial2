@@ -3,10 +3,10 @@ from fastapi import FastAPI, HTTPException, Body
 from fastapi.params import Depends
 from sqlmodel import select
 from utils.connection_db import init_db, get_session
-from data.models import usuario
+from data.models import usuario, tarea
 from sqlmodel.ext.asyncio.session import AsyncSession
 from operations.operations_db import actualizar_usuario, hacer_usuario_premium, obtener_usuarios_activos, obtener_usuarios_premium_activos
-
+from datetime import datetime
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -71,3 +71,17 @@ async def obtener_usuario(usuario_id: int, session: AsyncSession = Depends(get_s
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return encontrado
 
+@app.post("/tareas")
+async def crear_tarea(tarea_data: tarea, session: AsyncSession = Depends(get_session)):
+    nueva_tarea = tarea(
+        nombre=tarea_data.nombre,
+        descripcion=tarea_data.descripcion,
+        estado=tarea_data.estado,
+        usuario_id=tarea_data.usuario_id,
+        creacion=datetime.now(),
+        modificacion=None
+    )
+    session.add(nueva_tarea)
+    await session.commit()
+    await session.refresh(nueva_tarea)
+    return nueva_tarea

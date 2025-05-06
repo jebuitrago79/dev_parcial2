@@ -1,6 +1,6 @@
 '''Aqui debes construir las operaciones que se te han indicado'''
 from sqlmodel import Session, select
-from data.models import usuario
+from data.models import usuario, tarea
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 async def actualizar_usuario(usuario_id: int, datos: dict, session: AsyncSession):
@@ -34,3 +34,9 @@ async def obtener_usuarios_premium_activos(session: AsyncSession):
     )
     resultado = await session.exec(consulta)
     return resultado.all()
+
+async def crear_tarea(nueva_tarea: tarea, session: AsyncSession):
+    session.add(nueva_tarea)
+    await session.commit()
+    await session.refresh(nueva_tarea)
+    return nueva_tarea
