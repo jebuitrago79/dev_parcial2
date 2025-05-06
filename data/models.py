@@ -35,4 +35,4 @@ class tarea (SQLModel, table= True):
     creacion: Optional[datetime] = Field(default_factory=datetime.now)
     modificacion: Optional[datetime] = Field(default=None)
     estado: EstadoTarea = Field(default=EstadoTarea.pendiente)
-    usuario_id: int = Field(foreign_key="usuario.id")
+    usuario_id: int = Field(foreign_key="usuarios.id")
