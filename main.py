@@ -3,9 +3,9 @@ from fastapi import FastAPI, HTTPException, Body
 from fastapi.params import Depends
 from sqlmodel import select
 from utils.connection_db import init_db, get_session
-from data.models import usuario, tarea
+from data.models import usuario, tarea,EstadoTarea
 from sqlmodel.ext.asyncio.session import AsyncSession
-from operations.operations_db import actualizar_usuario, hacer_usuario_premium, obtener_usuarios_activos, obtener_usuarios_premium_activos, obtener_todas_las_tareas
+from operations.operations_db import actualizar_usuario, hacer_usuario_premium, obtener_usuarios_activos, obtener_usuarios_premium_activos, obtener_todas_las_tareas, obtener_tarea_por_id, actualizar_estado_tarea
 from datetime import datetime
 
 @asynccontextmanager
@@ -89,3 +89,21 @@ async def crear_tarea(tarea_data: tarea, session: AsyncSession = Depends(get_ses
 @app.get("/tareas")
 async def listar_tareas(session: AsyncSession = Depends(get_session)):
     return await obtener_todas_las_tareas(session)
+
+
+@app.get("/tareas/{tarea_id}")
+async def tarea_por_id(tarea_id: int, session: AsyncSession = Depends(get_session)):
+    tarea_encontrada = await obtener_tarea_por_id(tarea_id, session)
+    if not tarea_encontrada:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    return tarea_encontrada
+
+
+
+
+@app.patch("/tareas/{tarea_id}/estado")
+async def cambiar_estado_tarea(tarea_id: int, nuevo_estado: EstadoTarea,  session: AsyncSession = Depends(get_session)):
+    tarea_actualizada = await actualizar_estado_tarea(tarea_id, nuevo_estado, session)
+    if not tarea_actualizada:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    return tarea_actualizada
