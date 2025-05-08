@@ -68,3 +68,8 @@ async def actualizar_estado_tarea(tarea_id: int, nuevo_estado: EstadoTarea, sess
     await session.refresh(tarea_encontrada)
 
     return tarea_encontrada
+
+async def obtener_tareas_por_usuario(usuario_id: int, session: AsyncSession):
+    query = select(tarea).where(tarea.usuario_id == usuario_id)
+    result = await session.exec(query)
+    return result.all()

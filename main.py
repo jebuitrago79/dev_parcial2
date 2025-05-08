@@ -5,7 +5,7 @@ from sqlmodel import select
 from utils.connection_db import init_db, get_session
 from data.models import usuario, tarea,EstadoTarea
 from sqlmodel.ext.asyncio.session import AsyncSession
-from operations.operations_db import actualizar_usuario, hacer_usuario_premium, obtener_usuarios_activos, obtener_usuarios_premium_activos, obtener_todas_las_tareas, obtener_tarea_por_id, actualizar_estado_tarea
+from operations.operations_db import obtener_tareas_por_usuario, actualizar_usuario, hacer_usuario_premium, obtener_usuarios_activos, obtener_usuarios_premium_activos, obtener_todas_las_tareas, obtener_tarea_por_id, actualizar_estado_tarea
 from datetime import datetime
 
 @asynccontextmanager
@@ -103,3 +103,11 @@ async def cambiar_estado_tarea(tarea_id: int, nuevo_estado: EstadoTarea,  sessio
     if not tarea_actualizada:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return tarea_actualizada
+
+
+@app.get("/usuarios/{usuario_id}/tareas")
+async def tareas_por_usuario(usuario_id: int, session: AsyncSession = Depends(get_session)):
+    tareas = await obtener_tareas_por_usuario(usuario_id, session)
+    if tareas is None or len(tareas) == 0:
+        raise HTTPException(status_code=404, detail="No se encontraron tareas para este usuario")
+    return tareas
